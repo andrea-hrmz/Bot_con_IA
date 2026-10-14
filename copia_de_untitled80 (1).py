@@ -34,24 +34,59 @@ nest_asyncio.apply()
 model_path = "./keras_model.h5"
 labels_path = "./labels.txt"
 
-def get_class(image_path):
-  np.set_printoptions(suppress=True)
-  model = load_model(model_path, compile=False)
-  class_names = open(labels_path, "r").readlines()
+def detect_sanrio(image, model, labels):
+  model = load_model("keras_model.h5", compile=False)
+  class_names = open("labels.txt", "r").readlines()
   data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-  image = Image.open(image_path).convert("RGB")
+  image = image.convert("RGB")
   size = (224, 224)
   image = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
   image_array = np.asarray(image)
   normalized_image_array = (image_array.astype(np.float32) / 127.5) - 1
   data[0] = normalized_image_array
+
   prediction = model.predict(data)
-  print(prediction)
   index = np.argmax(prediction)
   class_name = class_names[index]
   confidence_score = prediction[0][index]
-  text1 = f"Class: {class_name[2:]} Confidence Score: {confidence_score}"
-  return text1
+
+  Datos = {
+    "Hello Kitty/n": ["a gatita británica súper amable. Le encanta hacer amigos, hornear galletas y tocar el piano."],
+    "My melody/n": ["a conejita dulce que usa su capucha rosa. Es amable y algo ingenua."],
+    "Kuromi/n": ["a rival/amiga de My Melody. Tiene estética punk, es traviesa, dramática y le encantan los chicos guapos."],
+    "Cinnamoroll/n": [" perrito blanco con orejas enormes que puede volar. Tímido, amable y muy cariñoso."],
+    "Pompompurin/n": [" perrito golden retriever con boina. Le encanta dormir, comer pudín y estar relajado."],
+    "Keroppi/n": ["a ranita energética y aventurera. Vive cerca de un estanque y es muy sociable."],
+    "Badtz-Maru/n": [" pingüino negro con actitud de “me vale todo”. Sarcástico, presumido y bastante travieso."],
+    "Kiki/n": ["o de los hermanitos del espacio. Kiki es más curioso y aventurero."],
+    "Lala/n": ["a de las hermanitas del espacio. Lala es más tranquila y dulce."],
+    "Chococat/n": [" gatito negro muy curioso e inteligente. Está obsesionado con enterarse de las novedades."],
+    "Pochacco/n": [" perrito blanco deportista. Le gusta jugar fútbol y básquet, aunque también disfruta comer y descansar."],
+    "Gudetama/n": [" huevo extremadamente flojo. Su filosofía básicamente es: qué cansancio existir."],
+    "Aggretsuko/n": [" panda oficinista que soporta un trabajo horrible y libera su estrés cantando death metal y karaoke."],
+    "Kirimichan/n": ["a rebanada de salmón que quiere convertirse en la comida favorita de alguien."],
+    "Hangyodon/n": ["a criatura marina azul, algo torpe y solitaria, pero muy cariñosa."],
+    "Tuxedosam/n": [" pingüino elegante que colecciona moños y ropa. Tiene una personalidad bastante despistada."],
+    "Cogimyun/n": ["a criaturita hecha de harina de trigo. Es muy sensible, llorona y adorable."],
+    "Marroncream/n": ["a conejita muy femenina a la que le gustan la moda, cocinar y las cosas bonitas."],
+    "Usahana/n": ["a conejita colorida y alegre. Le encantan el baile y las cosas relacionadas con el verano."],
+    "Goropikadon/n": [" grupo de tres pequeñas criaturas asociadas con colores y relámpagos. Son de los personajes más antiguos de Sanrio."],
+    "Wish me mell/n": ["a conejita que trabaja entregando cartas. Es muy dulce y soñadora."],
+    "Dear Daniel/n": [" amigo de la infancia de Hello Kitty y su novio oficial. También es un gato."],
+    "Coro-chan/n": ["osito pequeño, alegre y juguetón."],
+    "Mimmy/n": [" personaje hermana gemela de Hello Kitty. Usa un moño amarillo en la oreja derecha, mientras Kitty lo lleva en la izquierda."]
+}
+
+  if confidence_score > .25:
+    formatted_class_name_for_print = class_name.strip().split(" ", 1)[1]
+
+    key_for_datos_dict = formatted_class_name_for_print + '/n'
+
+    print("Class:", formatted_class_name_for_print)
+    print("Este personaje es un: ", Datos[key_for_datos_dict])
+    print("Confidence Score:", confidence_score)
+
+detect_sanrio(image, None, None)
 
 #Definimos los permisos del bot
 intents = discord.Intents.default()
